@@ -11,7 +11,7 @@ Run command to install requirments:
 pip3 install -r requirments.txt
 ...
 ## Linux
-...
+```
 pip install requirments.txt
-...
+```
 ## MacOS
