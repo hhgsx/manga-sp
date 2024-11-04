@@ -1,6 +1,6 @@
 import requests,os
 from bs4 import BeautifulSoup
-from src.manga import Manga
+from manga import Manga
 from pprint import pprint
 import inquirer,certifi
 
@@ -18,7 +18,6 @@ headers = {
         'Cache-Control': 'no-cache',
     }
 
-manga  = "Jujutsu Kaisen"
 
 def search_manga(manga_name):
 
@@ -157,6 +156,8 @@ def download_chapters(chapter_links,title):
             else:
                     print(f"Failed to download image: {url}")
 
+manga = input("enter manga to download (ensure it is writen well and with spaces) ")
+#manga  = "Jujutsu Kaisen"
 
 manga = get_manga_info(search_manga(manga))
 download_chapters(manga.chapters,manga.title)
