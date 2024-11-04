@@ -6,12 +6,12 @@
 Run command to install requirments:
 
 
-## Windows
+### Windows
 ```
 pip3 install -r requirments.txt
 ```
-## Linux
+### Linux
 ```
 pip install requirments.txt
 ```
-## MacOS
+### MacOS
