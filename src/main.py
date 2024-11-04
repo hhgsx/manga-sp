@@ -1,6 +1,6 @@
 import requests,os
 from bs4 import BeautifulSoup
-from manga import Manga
+from src.manga import Manga
 from pprint import pprint
 import inquirer,certifi
 
