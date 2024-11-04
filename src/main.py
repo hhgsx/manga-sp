@@ -157,7 +157,7 @@ def download_chapters(chapter_links,title):
                     print(f"Failed to download image: {url}")
 
 manga = input("enter manga to download (ensure it is writen well and with spaces) ")
-#manga  = "Jujutsu Kaisen"
+anga  = "Jujutsu Kaisen"
 
 manga = get_manga_info(search_manga(manga))
 download_chapters(manga.chapters,manga.title)
