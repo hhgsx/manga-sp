@@ -18,7 +18,7 @@ headers = {
         'Cache-Control': 'no-cache',
     }
 
-manga  = "Burn the witch"
+manga  = "Jujutsu Kaisen"
 
 def search_manga(manga_name):
 
