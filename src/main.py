@@ -159,6 +159,12 @@ def download_chapters(chapter_links,title):
 manga = input("enter manga to download (ensure it is writen well and with spaces) ")
 anga  = "Jujutsu Kaisen"
 
-manga = get_manga_info(search_manga(manga))
-download_chapters(manga.chapters,manga.title)
-search_manga(manga)
+
+if __name__ == '__main__':
+
+    import argparse
+
+    
+    manga = get_manga_info(search_manga(manga))
+    download_chapters(manga.chapters,manga.title)
+    search_manga(manga)
