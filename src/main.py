@@ -111,8 +111,6 @@ def get_manga_info(url):
     chapters = chapters.select_one(".row-content-chapter")
     chapters = chapters.find_all("a")
     
-    
-
     manga = Manga(title.text,author.text,cover,status.text,genres,chapters)
 
     return manga
@@ -123,12 +121,6 @@ def download_chapters(chapter_links,title):
 
     links = []
 
-    """for chapter in chapter_links:
-        link = chapter.get("hr
-        ef")
-        chapter_name = chapter.text
-        links.append(link)"""
-    
     for chapter_index, chapter in enumerate(chapter_links):
 
         chapter_link = chapter["href"]
@@ -156,15 +148,20 @@ def download_chapters(chapter_links,title):
             else:
                     print(f"Failed to download image: {url}")
 
-manga = input("enter manga to download (ensure it is writen well and with spaces) ")
-anga  = "Jujutsu Kaisen"
-
+#manga = input("enter manga to download (ensure it is writen well and with spaces) ")
 
 if __name__ == '__main__':
-
     import argparse
 
-    
-    manga = get_manga_info(search_manga(manga))
-    download_chapters(manga.chapters,manga.title)
-    search_manga(manga)
+    parser = argparse.ArgumentParser(description="downloads for manga pages")
+    parser.add_argument('--link',type=str,default=None,help="Link of the manga")
+    parser.add_argument('--title',)
+    args = parser.parse_args()
+
+    if args.link is None:
+        print("Please provide a manga link using --link")
+    else:
+        manga_data = search_manga(args.link)
+        manga_info = get_manga_info(manga_data)
+        download_chapters(manga_info.chapters,manga_info.title)
+        

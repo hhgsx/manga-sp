@@ -1,13 +1,10 @@
-from pprint import pprint
-import inquirer
+import click
+@click.command()
+@click.option('--count', default=1, help='number of greetings')
+@click.argument('name')
+def hello(count, name):
+    for x in range(count):
+        click.echo(f"Hello {name}!")
 
-questions = [
-    inquirer.List(
-        "size",
-        message="What size do you need?",
-        choices=["Jumbo", "Large", "Standard", "Medium", "Small", "Micro"],
-    ),
-]
-
-answers = inquirer.prompt(questions)
-pprint(answers)
+if __name__ == "__main__":
+    hello()
