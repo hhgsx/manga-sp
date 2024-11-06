@@ -63,9 +63,9 @@ def search_manga(manga_name):
         }
 
         manga_choices[display["name"]] = manga_url
-        print(f"display: {display} (type: {type(display)})")  # Debugging line
+        #print(f"display: {display} (type: {type(display)})")  # Debugging line
 
-    manga_choices["Exit"] = None
+    
 
     
     #clear_console()
@@ -77,7 +77,7 @@ def search_manga(manga_name):
         )
     ]
         
-    answer = inquirer.prompt(questions=question)
+    answer = inquirer.prompt(question)
     chosen_manga = answer["manga"]
 
     chosen_url = manga_choices[chosen_manga]

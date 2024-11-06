@@ -2,3 +2,6 @@ venv/
 __pycache__/
 dist/
 manga_sp.egg-info/
+.gitignore
+tes.py
+setup.py
