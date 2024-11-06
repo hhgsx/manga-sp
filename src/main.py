@@ -18,20 +18,28 @@ headers = {
         'Cache-Control': 'no-cache',
     }
 
+def clear_console():
+    # Clear command for Windows
+    if os.name == 'nt':
+        os.system('cls')
+    # Clear command for Unix/Linux/Mac
+    else:
+        os.system('clear')
+
 
 def search_manga(manga_name):
 
+    # Format manga name for URL
     manga_name = manga_name.replace(" ", "_")
-     
     base_url = "https://m.manganelo.com/search/story/"
-
     manga_url = base_url + manga_name
 
+    # Make request and parse content
     response = requests.get(manga_url,verify=certifi.where())
     soup = BeautifulSoup(response.content, "html.parser")
 
+    # Find manga items
     manga_item = soup.find_all("div",class_="search-story-item")
-
     manga_choices = {}
 
     for item in manga_item:
@@ -48,15 +56,19 @@ def search_manga(manga_name):
 
         #manga_questions.append(manga_name.text+" | " + manga_views[1].text +" |  By " + manga_author.text)
 
-        display = f"{
-            {manga_name.text},
-            {manga_views[1].text},
-            {manga_author}
-        }"
+        display = {
+            "name":manga_name.text,
+            "views":manga_views[1].text,
+            "author":manga_author
+        }
 
-        manga_choices[display] =manga_url
+        manga_choices[display["name"]] = manga_url
+        print(f"display: {display} (type: {type(display)})")  # Debugging line
 
+    manga_choices["Exit"] = None
 
+    
+    #clear_console()
     question = [
         inquirer.List(
             "manga",
@@ -65,11 +77,13 @@ def search_manga(manga_name):
         )
     ]
         
-    answer = inquirer.prompt(question)
+    answer = inquirer.prompt(questions=question)
     chosen_manga = answer["manga"]
 
     chosen_url = manga_choices[chosen_manga]
     print(f"Selected manga url: {chosen_url}")
+
+    
 
     return chosen_url
         
