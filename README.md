@@ -15,3 +15,6 @@ pip install -r requirments.txt
 pip install -r requirments.txt
 ```
 ### MacOS
+```
+pip3 install -r requirements.txt
+```
