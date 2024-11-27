@@ -162,6 +162,34 @@ def download_chapters(chapter_links,title):
             else:
                     print(f"Failed to download image: {url}")
 
+
+
+def latest_updates():
+
+    url = "https://m.manganelo.com/genre-all-update-latest"
+    response = requests.get(url,verify = certifi.where())
+    soup = BeautifulSoup(response.content,"html.parser")
+
+    manga_items = soup.find_all("div",class_="content-genres-item")
+
+    list_of_latest = []
+
+    for item in manga_items:
+
+        manga_item_cover = item.select_one("img")['src']
+        manga_item_title = item.select_one(".genres-item-info h3 a")
+
+        api = {
+                "title" : manga_item_title.text ,
+                "cover" : manga_item_cover
+                }
+
+        list_of_latest.append(api)
+
+
+    return list_of_latest
+        
+
 #manga = input("enter manga to download (ensure it is writen well and with spaces) ")
 
 if __name__ == '__main__':
@@ -179,3 +207,5 @@ if __name__ == '__main__':
         manga_info = get_manga_info(manga_data)
         download_chapters(manga_info.chapters,manga_info.title)
         
+
+latest_updates()
