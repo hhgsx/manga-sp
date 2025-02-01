@@ -1,6 +1,6 @@
 import requests,os
 from bs4 import BeautifulSoup
-from manga import Manga
+from .manga import Manga
 from pprint import pprint
 import inquirer,certifi
 
@@ -27,6 +27,37 @@ def clear_console():
         os.system('clear')
 
 
+def get_popular_manga():
+
+    hot_manga_page = 1
+    url = f'https://m.manganelo.com/genre-all/{hot_manga_page}?type=topview'
+
+    response = requests.get(url,verify=certifi.where())
+    soup = BeautifulSoup(response.content,"html.parser")
+
+    hot_manga = soup.find_all("div",class_="content-genres-item")
+    
+
+    popular = []
+
+    for manga in hot_manga:
+
+        title = manga.select_one(".genres-item-img.bookmark_check ")['title']
+        link = manga.select_one(".genres-item-img.bookmark_check")['href']
+        cover = manga.select_one("img")['src']
+
+        hot_manga = {
+                "cover" : cover,
+                "manga_url" : link,
+                "title" : title
+                }
+
+        popular.append(hot_manga)
+
+    return popular
+
+
+
 def search_manga(manga_name):
 
     # Format manga name for URL
@@ -40,53 +71,26 @@ def search_manga(manga_name):
 
     # Find manga items
     manga_item = soup.find_all("div",class_="search-story-item")
-    manga_choices = {}
+    manga_choices = []
 
-    for item in manga_item:
+    for manga in manga_item:
 
-        manga_item_info = item.select_one(".item-right")
 
-        manga_name = manga_item_info.select_one("h3 a")
+        title = manga.select_one(".item-img.bookmark_check ")['title']
+        link = manga.select_one(".item-img.bookmark_check")['href']
+        cover = manga.select_one("img")['src']
+        api = {
+                "title" : title ,
+                "cover" : cover ,
+                "manga_url" : link
+                }
 
-        manga_url = manga_name["href"]
+        manga_choices.append(api)
 
-        manga_views = manga_item_info.select("span.item-time")
 
-        manga_author = manga_item_info.select_one("span.item-author")
+    return manga_choices
 
-        #manga_questions.append(manga_name.text+" | " + manga_views[1].text +" |  By " + manga_author.text)
-
-        display = {
-            "name":manga_name.text,
-            "views":manga_views[1].text,
-            "author":manga_author
-        }
-
-        manga_choices[display["name"]] = manga_url
-        #print(f"display: {display} (type: {type(display)})")  # Debugging line
-
-    
-
-    
-    #clear_console()
-    question = [
-        inquirer.List(
-            "manga",
-            message = "Choose one of the manga below",
-            choices = list(manga_choices.keys()),
-        )
-    ]
-        
-    answer = inquirer.prompt(question)
-    chosen_manga = answer["manga"]
-
-    chosen_url = manga_choices[chosen_manga]
-    print(f"Selected manga url: {chosen_url}")
-
-    
-
-    return chosen_url
-        
+       
 
 def get_manga_info(url):
 
@@ -111,11 +115,9 @@ def get_manga_info(url):
     # Get author , status and genres
 
     table = manga_details.select_one(".story-info-right")
-    author = table.select_one(".variations-tableInfo > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(2) ")
-                            #    > a:nth-child(1)
-                            #   .variations-tableInfo > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(2)
-    status = table.select_one(".variations-tableInfo > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(2)")
-    genres = table.select_one(".variations-tableInfo > tbody:nth-child(1) > tr:nth-child(3)")
+    author = table.select_one(".variations-tableInfo > tbody:nth-child(1) > tr:nth-child(2) > td:nth-child(2) ")
+    status = table.select_one(".variations-tableInfo > tbody:nth-child(1) > tr:nth-child(3) > td:nth-child(2)")
+    genres = table.select_one(".variations-tableInfo > tbody:nth-child(1) > tr:nth-child(4) > td:nth-child(2)")
     genres = genres.find_all("a")
     print(author)
 
@@ -125,7 +127,20 @@ def get_manga_info(url):
     chapters = chapters.select_one(".row-content-chapter")
     chapters = chapters.find_all("a")
     
-    manga = Manga(title.text,author.text,cover,status.text,genres,chapters)
+    chapters_list = []
+
+    for chapter in chapters:
+        chapter_title = chapter.text
+        chapter_link = chapter["href"]
+
+        chapter_js = {
+                "chapterTitle" : chapter_title,
+                "chapterLink" : chapter_link
+                }
+
+        chapters_list.append(chapter_js)
+    
+    manga = Manga(title.text,author.text,cover,status.text,genres,chapters_list)
 
     return manga
 
@@ -167,7 +182,7 @@ def download_chapters(chapter_links,title):
 def latest_updates():
 
     url = "https://m.manganelo.com/genre-all-update-latest"
-    response = requests.get(url,verify = certifi.where())
+    response = requests.get(url,headers = headers,verify = False)
     soup = BeautifulSoup(response.content,"html.parser")
 
     manga_items = soup.find_all("div",class_="content-genres-item")
@@ -178,16 +193,37 @@ def latest_updates():
 
         manga_item_cover = item.select_one("img")['src']
         manga_item_title = item.select_one(".genres-item-info h3 a")
+        manga_url = item.select_one(".genres-item-info h3 a")["href"]
 
         api = {
                 "title" : manga_item_title.text ,
-                "cover" : manga_item_cover
+                "cover" : manga_item_cover ,
+                "manga_url" : manga_url
                 }
 
         list_of_latest.append(api)
 
 
     return list_of_latest
+
+def get_chapter(chapter_url):
+    response = requests.get(chapter_url)
+    soup = BeautifulSoup(response.content, "html.parser")
+    manga_images = soup.select_one("html body div.body-site div.container-chapter-reader")
+    manga_images = manga_images.find_all("img")
+    list_of_images = []
+    for img in manga_images:
+        img_name = img['alt']
+        img_link = img['src']
+
+        img_list = {
+                "imgTitle" : img_name,
+                "imgLink" : img_link
+                }
+
+        list_of_images.append(img_list)
+
+    return list_of_images
         
 
 #manga = input("enter manga to download (ensure it is writen well and with spaces) ")
